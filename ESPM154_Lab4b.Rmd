@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Load required packages...
 ```{r packages, include=FALSE, warning=FALSE}
 # Make a list of the packages we need, check whether they're installed, and install the ones we're missing...
-required.pkg <- c("terra", "gdm", "GGally", "cowplot", "vcfR")
+required.pkg <- c("terra", "gdm", "GGally", "cowplot", "vcfR", "ecodist", "gtExtras")
 pkgs.not.installed <- required.pkg[!sapply(required.pkg, function(p) require(p, character.only=T))]
 if (length(pkgs.not.installed) > 0) install.packages(pkgs.not.installed, dependencies=TRUE)
 
@@ -43,8 +43,8 @@ source("Gen_dist.R")
 ## Part 1: IBD and IBE ##
 
 First, let's load our dataset.
-```{r}
-load("liz_data.Rdata")
+```{r load-data}
+load("liz_data.RData")
 ```
 
 # Calculating genetic distances
@@ -63,14 +63,14 @@ sqrt((0-1)^2 + (1-1)^2 + (2-2)^2 + (0-2)^2) = sqrt(1 + 0 + 0 + 4) = sqrt(5) = 2.
 **Take a moment to answer Question 5.**
 
 Let's calculate the genetic distances for our data and assign them to an object named 'gendist' as a distance matrix.
-```{r, warning=FALSE}
+```{r gendist, warning=FALSE}
 liz_gendist <- gen_dist(liz_vcf, dist_type = "euclidean") # Calculate Euclidean genetic distances from the SNPs
 gen_mat <- as.matrix(liz_gendist) # Convert the distances to a matrix object
 gen_mat[1:6, 1:6] # Show the first six rows and columns to see what we have
 ```
 
 Let's also load some environmental data layers for California. We will look at two variables: isothermality (isotherm), which is the annual temperature range, and precipitation seasonality (PrecipSeas), or how much precipitation changes across different seasons.
-```{r}
+```{r extract-vals}
 CA_var <- terra::rast(c("CA_PrecipSeasonality.tif",
                        "CA_Isothermality.tif"))
 
@@ -86,14 +86,14 @@ Multiple matrix regression with randomization (MMRR; [Wang 2013](https://onlinel
 The inputs for MMRR are a genetic distance matrix, a geographic distance matrix, and/or one or more environmental distance matrices. The geographic distance matrix is calculated based on the coordinates for each sample, and the environmental distance matrix is calculated from environmental data at each sampling location. We will use Euclidean distances for geographic and environmental distances, as we did for our genetic distances.
 
 First, we will extract the values from the two environmental data layers at each sample coordinate.
-```{r enviro data}
+```{r env-data}
 # Extract values from our environmental raster (CA_var)
 env <- terra::extract(CA_var, liz_coords, ID = FALSE)
 head(env)
 ```
 
 Then we'll calculate the distance matrices for each of them along with geographic distance.
-```{r}
+```{r env-mats, warning=F}
 # Calculate environmental distances (this will create a list of environmental distance matrices)
 env_mats <- env_dist(env)
 
@@ -125,7 +125,7 @@ You haven't been shown an example of how to run the MMRR analysis using mmrr_run
 set.seed(12345)
 
 # Assign the output of the MMRR analysis to an object named 'results' so that we can plot it later.
-results <- mmrr_run(gen_mat, env_mats, nperm = 999, stdz = TRUE, model = "full")
+results <- 
 ```
 
 # MMRR Results
@@ -194,13 +194,6 @@ The gdm_map() function will output two plots:
 ```{r GDM plots, fig.width = 5, fig.height = 5, results='hide'}
 map <- gdm_map(gdm_full$model, CA_var, liz_coords)
 ```
-
-```{r}
-rastDat <- na.omit(terra::values(rastTrans))
-
-
-```
-
 
 For those of you who are curious, this map is created by: 
 1. Transforming the original environmental layers based on biological importance (i.e., based on the I-splines)
