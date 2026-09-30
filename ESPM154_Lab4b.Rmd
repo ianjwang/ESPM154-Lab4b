@@ -26,6 +26,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Load required packages...
 ```{r packages, include=FALSE, warning=FALSE}
+# If you are running this exercise on datahub.berkeley.edu (instead of ursa.datahub.berkeley.edu), remove the #s from the next line before running this chunk.
+#devtools::install_github("TheWangLab/algatr")
+
 # Make a list of the packages we need, check whether they're installed, and install the ones we're missing...
 required.pkg <- c("terra", "gdm", "GGally", "cowplot", "vcfR", "ecodist", "gtExtras", "algatr")
 pkgs.not.installed <- required.pkg[!sapply(required.pkg, function(p) require(p, character.only=T))]
