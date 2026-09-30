@@ -27,15 +27,12 @@ knitr::opts_chunk$set(echo = TRUE)
 Load required packages...
 ```{r packages, include=FALSE, warning=FALSE}
 # Make a list of the packages we need, check whether they're installed, and install the ones we're missing...
-required.pkg <- c("terra", "gdm", "GGally", "cowplot", "vcfR", "ecodist", "gtExtras")
+required.pkg <- c("terra", "gdm", "GGally", "cowplot", "vcfR", "ecodist", "gtExtras", "algatr")
 pkgs.not.installed <- required.pkg[!sapply(required.pkg, function(p) require(p, character.only=T))]
 if (length(pkgs.not.installed) > 0) install.packages(pkgs.not.installed, dependencies=TRUE)
 
 # Load the required libraries...
 lapply(required.pkg, library, character.only = TRUE) 
-source("GDM.R")
-source("MMRR.R")
-source("Gen_dist.R")
 ```
 
 --------------------------------------------
@@ -44,7 +41,7 @@ source("Gen_dist.R")
 
 First, let's load our dataset.
 ```{r load-data}
-load("liz_data.RData")
+load_algatr_example()
 ```
 
 # Calculating genetic distances
